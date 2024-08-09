@@ -15,6 +15,7 @@ class DBClient {
     );
     this.isConnected = false;
     this.db = null;
+
     this.client.connect((err) => {
       if (!err) {
         this.isConnected = true;
@@ -24,18 +25,18 @@ class DBClient {
   }
 
   /**
-   * Checks if the mongoDb client is alive.
+   * Checks if the MongoDB client is connected.
    *
-   * @return {boolean} The connection status of the mongoDb.
+   * @return {boolean} The connection status of the MongoDB.
    */
   isAlive() {
     return this.isConnected;
   }
 
   /**
-   * Asynchronously counts the num of documents in the "users" collection.
+   * Asynchronously counts the number of documents in the "users" collection.
    *
-   * @return {Promise<number>} The num of documents in the "users" collection.
+   * @return {Promise<number>} The number of documents in the "users" collection.
    */
   async nbUsers() {
     return this.db.collection('users').countDocuments();
@@ -44,8 +45,7 @@ class DBClient {
   /**
    * Calculates the number of files in the 'files' collection in the database.
    *
-   * @return {Promise<number>} Returns a Promise that resolves to the number of
-   * files in the 'files' collection.
+   * @return {Promise<number>} Resolves to the number of files in the 'files' collection.
    */
   async nbFiles() {
     return this.db.collection('files').countDocuments();
@@ -64,8 +64,7 @@ class DBClient {
    * Finds a user by their email in the "users" collection.
    *
    * @param {string} email - The email of the user to find.
-   * @return {Promise} A Promise that resolves with the user object, or null if
-   * not found.
+   * @return {Promise<object|null>} Resolves with the user object, or null if not found.
    */
   findUserByEmail(email) {
     return this.db.collection('users').findOne({ email });
@@ -75,8 +74,7 @@ class DBClient {
    * Finds a user by their ID in the database.
    *
    * @param {string} userId - The ID of the user to find.
-   * @return {Promise<object>} A promise that resolves to the user object if
-   * found, or null if not found.
+   * @return {Promise<object|null>} Resolves to the user object if found, or null if not found.
    */
   findUserById(userId) {
     return this.db.collection('users').findOne({ _id: ObjectId(userId) });
@@ -87,17 +85,15 @@ class DBClient {
    *
    * @param {string} email - The email of the user to add.
    * @param {string} password - The password of the user to add.
-   * @return {Object} The user object that was added to the database, with the
-   * password and _id fields removed.
+   * @return {object} The user object that was added to the database, with the password and _id fields removed.
    */
   async addUser(email, password) {
     const hashedPassword = sha1(password);
-    const result = await this.db.collection('users').insertOne(
-      {
-        email,
-        password: hashedPassword,
-      },
-    );
+    const result = await this.db.collection('users').insertOne({
+      email,
+      password: hashedPassword,
+    });
+
     return {
       email: result.ops[0].email,
       id: result.ops[0]._id,
@@ -107,3 +103,4 @@ class DBClient {
 
 const dBClient = new DBClient();
 export default dBClient;
+
